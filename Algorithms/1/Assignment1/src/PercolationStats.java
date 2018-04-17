@@ -4,9 +4,13 @@ import edu.princeton.cs.algs4.StdStats;
 public class PercolationStats {
 
     private final double[] x;
-    private final double CONFIDENCE_95 = 1.96;
+    private final static double CONFIDENCE_95 = 1.96;
 
     public PercolationStats(int n, int trials) {
+        if (n <= 0 || trials <= 0) {
+            throw new IllegalArgumentException("n or trials is less or equal than 0");
+        }
+
         x = new double[trials];
         for (int i = 0; i < trials; i++) {
             int openCount = 0;

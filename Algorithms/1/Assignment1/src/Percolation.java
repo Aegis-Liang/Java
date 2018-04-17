@@ -10,6 +10,9 @@ public class Percolation {
     private int openCount;
 
     public Percolation(int n) {
+        if(n<=0) {
+            throw new IllegalArgumentException("n is less or equal than 0");
+        }
         this.list = new WeightedQuickUnionUF(n * n + 2);
         this.size = n;
         this.top = n * n;
@@ -24,9 +27,9 @@ public class Percolation {
 
     private void checkIndex(int row, int col) {
         if (row < 1 || row > this.size)
-            throw new IndexOutOfBoundsException("row index out of bounds");
+            throw new IllegalArgumentException("row index out of bounds");
         if (col < 1 || col > this.size)
-            throw new IndexOutOfBoundsException("col index out of bounds");
+            throw new IllegalArgumentException("col index out of bounds");
     }
 
     private boolean validateAndOpen(int row, int col) {
