@@ -1,10 +1,12 @@
 import edu.princeton.cs.algs4.StdRandom;
 import edu.princeton.cs.algs4.StdStats;
+import java.lang.Math;
 
 public class PercolationStats {
-
+    private static final double CONFIDENCE_95 = 1.96;
     private final double[] x;
-    private final static double CONFIDENCE_95 = 1.96;
+    private final double mean;
+    private final double stddev;
 
     public PercolationStats(int n, int trials) {
         if (n <= 0 || trials <= 0) {
@@ -25,22 +27,25 @@ public class PercolationStats {
             }
             x[i] = (double) openCount / (n * n);
         }
+
+        this.mean = StdStats.mean(this.x);
+        this.stddev = StdStats.stddev(this.x);
     }
 
     public double mean() {
-        return StdStats.mean(this.x);
+        return this.mean;
     }
 
     public double stddev() {
-        return StdStats.stddev(this.x);
+        return this.stddev;
     }
 
     public double confidenceLo() {
-        return this.mean() - this.CONFIDENCE_95 * this.stddev() / x.length;
+        return this.mean - PercolationStats.CONFIDENCE_95 * this.stddev / Math.sqrt(x.length);
     }
 
     public double confidenceHi() {
-        return this.mean() + this.CONFIDENCE_95 * this.stddev() / x.length;
+        return this.mean + PercolationStats.CONFIDENCE_95 * this.stddev / Math.sqrt(x.length);
     }
 
 

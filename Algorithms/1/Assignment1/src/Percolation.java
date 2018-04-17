@@ -10,7 +10,7 @@ public class Percolation {
     private int openCount;
 
     public Percolation(int n) {
-        if(n<=0) {
+        if (n <= 0) {
             throw new IllegalArgumentException("n is less or equal than 0");
         }
         this.list = new WeightedQuickUnionUF(n * n + 2);
@@ -84,10 +84,12 @@ public class Percolation {
     }
 
     public boolean isOpen(int row, int col) {
+        this.checkIndex(row, col);
         return this.state[row - 1][col - 1];
     }
 
     public boolean isFull(int row, int col) {
+        this.checkIndex(row, col);
         return this.list.connected(this.top, this.xyTo1D(row, col));
     }
 
