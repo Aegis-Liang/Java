@@ -1,21 +1,19 @@
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
-public class Percolation {
+public class Percolation_Origin {
 
     private final WeightedQuickUnionUF list;
-    private final WeightedQuickUnionUF list2;
     private final int size;
     private final int top;
     private final int bottom;
     private boolean[][] state;
     private int openCount;
 
-    public Percolation(int n) {
+    public Percolation_Origin(int n) {
         if (n <= 0) {
             throw new IllegalArgumentException("n is less or equal than 0");
         }
         this.list = new WeightedQuickUnionUF(n * n + 2);
-        this.list2 = new WeightedQuickUnionUF(n * n + 2);
         this.size = n;
         this.top = n * n;
         this.bottom = n * n + 1;
@@ -63,11 +61,9 @@ public class Percolation {
         this.openCount++;
 
         // first row or col
-        if (row == 1) {
+        if (row == 1)
             // connect top
             this.list.union(this.top, middleIndex);
-            this.list2.union(this.top, middleIndex);
-        }
 
         // we cannot use "else" here, both row == 1 and row == this.sie need to be verified,
         // otherwise n = 1 will result does not percolate.
@@ -77,22 +73,14 @@ public class Percolation {
 
 
         // connect 4 directions of the middle point
-        if (upOpen) {
+        if (upOpen)
             this.list.union(middleIndex, upIndex);
-            this.list2.union(middleIndex, upIndex);
-        }
-        if (downOpen) {
+        if (downOpen)
             this.list.union(middleIndex, downIndex);
-            this.list2.union(middleIndex, downIndex);
-        }
-        if (leftOpen) {
+        if (leftOpen)
             this.list.union(middleIndex, leftIndex);
-            this.list2.union(middleIndex, leftIndex);
-        }
-        if (rightOpen) {
+        if (rightOpen)
             this.list.union(middleIndex, rightIndex);
-            this.list2.union(middleIndex, rightIndex);
-        }
     }
 
     public boolean isOpen(int row, int col) {
@@ -102,7 +90,7 @@ public class Percolation {
 
     public boolean isFull(int row, int col) {
         this.checkIndex(row, col);
-        return this.list2.connected(this.top, this.xyTo1D(row, col));
+        return this.list.connected(this.top, this.xyTo1D(row, col));
     }
 
     public int numberOfOpenSites() {

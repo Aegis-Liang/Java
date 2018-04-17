@@ -1,6 +1,5 @@
 import edu.princeton.cs.algs4.StdRandom;
 import edu.princeton.cs.algs4.StdStats;
-import java.lang.Math;
 
 public class PercolationStats {
     private static final double CONFIDENCE_95 = 1.96;
