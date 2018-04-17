@@ -1,14 +1,13 @@
-import edu.princeton.cs.algs4.StdRandom;
-import edu.princeton.cs.algs4.StdStats;
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class Percolation {
 
-    private WeightedQuickUnionUF list;
-    private int size;
-    private int top;
-    private int bottom;
+    private final WeightedQuickUnionUF list;
+    private final int size;
+    private final int top;
+    private final int bottom;
     private boolean[][] state;
+    private int openCount;
 
     public Percolation(int n) {
         this.list = new WeightedQuickUnionUF(n * n + 2);
@@ -16,6 +15,7 @@ public class Percolation {
         this.top = n * n;
         this.bottom = n * n + 1;
         this.state = new boolean[size][size];
+        this.openCount = 0;
     }
 
     private int xyTo1D(int row, int col) {
@@ -34,8 +34,8 @@ public class Percolation {
             return false;
         if (this.isOpen(row, col))
             return true;
-        else
-            return false;
+
+        return false;
     }
 
     public void open(int row, int col) {
@@ -55,6 +55,7 @@ public class Percolation {
 
         // set the state open
         this.state[row - 1][col - 1] = true;
+        this.openCount++;
 
         // first row or col
         if (row == 1)
@@ -88,12 +89,15 @@ public class Percolation {
     }
 
     public int numberOfOpenSites() {
-        int count = 0;
-        for (int i = 0; i < this.size; i++)
-            for (int j = 0; j < this.size; j++)
-                if (this.state[i][j] == true)
-                    count++;
-        return count;
+        return this.openCount;
+//        [INFO] Percolation.java:92: Using a loop in this method might be a performance bug. [Performance]
+//        [INFO] Percolation.java:93: Using a loop in this method might be a performance bug. [Performance]
+//        int count = 0;
+//        for (int i = 0; i < this.size; i++)
+//            for (int j = 0; j < this.size; j++)
+//                if (this.state[i][j])
+//                    count++;
+//        return count;
     }
 
     public boolean percolates() {
