@@ -1,0 +1,2 @@
+E:\Java\Algorithms\1\Assignment1\out\production\Assignment1>java -classpath ".;C
+:\Users\Aegis\algs4\algs4.jar" PercolationVisualizer input2.txt

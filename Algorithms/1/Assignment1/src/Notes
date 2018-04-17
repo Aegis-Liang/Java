@@ -1,0 +1,17 @@
+1 Add algs4.jar package in Intellij Idea
+    File -> Project Structure -> Project Settings -> Modules -> [ Your Project ] -> Dependencies -> [ Click "+" ] -> JARs or directories -> [ Find algs4.jar ] -> OK -> Apply
+
+2 Compile java file with correct version
+    Settings -> Build, Execution, Deployment -> Java Compiler -> Project bytecode version: -> 1.7 -> Apply -> OK
+
+3. Run Commands:
+    E:\Java\Algorithms\1\Assignment1\out\production\Assignment1>java -classpath ".;C:\Users\Aegis\algs4\algs4.jar" PercolationVisualizer input2.txt
+
+4. Input file interpretation
+    It get a very bad feeling when watching the input file in Windows, the
+    2
+    1 1
+    2 2
+    1 2
+    will looks like 21 12 21 2 in Windows
+
