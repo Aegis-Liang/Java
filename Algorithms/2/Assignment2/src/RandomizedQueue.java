@@ -38,6 +38,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     }
 
     public void enqueue(Item item) {
+        if (item == null) throw new java.lang.IllegalArgumentException("item is null");
         // double size of array if necessary and recopy to front of array
         if (n == q.length) resize(2 * q.length);   // double size of array if necessary
         q[last++] = item;                        // add item
@@ -68,7 +69,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
     public Item sample() {
         if (isEmpty()) throw new NoSuchElementException("Queue underflow");
-        return q[first + StdRandom.uniform(this.n) % q.length];
+        return q[(first + StdRandom.uniform(this.n)) % q.length]; // forgot to add () before mod operation
     }
 
     public Iterator<Item> iterator() {
@@ -79,20 +80,34 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 //            q[indexChose] = q[x];
 //            q[x] = temp;
 //        }
-        for(int x=0; x < (last-1  + q.length - first) % q.length; x++) {
-            int offsetChose = StdRandom.uniform(x+1);
-            int indexX = (x + first) %  q.length;
+        for (int x = 0; x < (last - 1 + q.length - first) % q.length + 1; x++) { // need +1 at the end, otherwise the last item didn't swap
+            int offsetChose = StdRandom.uniform(x + 1);
+            int indexX = (x + first) % q.length;
             int indexChose = (offsetChose + first) % q.length;
             Item temp = q[indexChose];
             q[indexChose] = q[indexX];
             q[indexX] = temp;
         }
-        return new ArrayIterator();
+
+        Item[] Result = (Item[]) new Object[q.length];
+        for (int i=0;i<q.length;i++)
+        {
+            Result[i] = q[i];
+        }
+
+        return new ArrayIterator(Result);
     }
 
     // an iterator, doesn't implement remove() since it's optional
     private class ArrayIterator implements Iterator<Item> {
-        private int i = 0;
+        private int i;
+        private Item[] ItemRef;
+
+        public ArrayIterator(Item[] Result)
+        {
+            this.i = 0;
+            this.ItemRef = Result;
+        }
 
         public boolean hasNext() {
             return i < n;
@@ -104,7 +119,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
         public Item next() {
             if (!hasNext()) throw new NoSuchElementException();
-            Item item = q[(i + first) % q.length];
+            Item item = ItemRef[(i + first) % ItemRef.length];
             i++;
             return item;
         }
@@ -112,20 +127,37 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
 
     public static void main(String[] args) {
-        RandomizedQueue<String> randQueue = new RandomizedQueue<>();
-        while (!StdIn.isEmpty()) {
-            String item = StdIn.readString();
-            if (!item.equals("-"))
-                randQueue.enqueue(item);
-            else if (!randQueue.isEmpty())
-                StdOut.print(randQueue.dequeue() + " ");
+//        RandomizedQueue<String> randQueue = new RandomizedQueue<>();
+//        while (!StdIn.isEmpty()) {
+//            String item = StdIn.readString();
+//            if (!item.equals("-"))
+//                randQueue.enqueue(item);
+//            else if (!randQueue.isEmpty())
+//                StdOut.print(randQueue.dequeue() + " ");
+//
+//
+//            StdOut.println("(" + randQueue.size() + " left on queue)");
+//        }
+//        Iterator<String> randIter = randQueue.iterator();
+//        while (randIter.hasNext())
+//            System.out.println(randIter.next());
 
+        RandomizedQueue<Integer> q = new RandomizedQueue<Integer>();
 
+        q.enqueue(2);
+        q.enqueue(3);
+        q.enqueue(1);
+        q.enqueue(0);
+        q.enqueue(4);
+        q.enqueue(5);
 
-            StdOut.println("(" + randQueue.size() + " left on queue)");
-        }
-        Iterator<String> randIter = randQueue.iterator();
-        while(randIter.hasNext())
-            System.out.println(randIter.next());
+        Iterator<Integer> it = q.iterator();
+        Iterator<Integer> it2 = q.iterator();
+
+        while (it.hasNext())
+            System.out.println("Iterator it " + it.next());
+
+        while (it2.hasNext())
+            System.out.println("Iterator it2 " + it2.next());
     }
 }

@@ -127,6 +127,5 @@ public class Deque<Item> implements Iterable<Item> {
 
             StdOut.println("(" + deque.size() + " left on queue)");
         }
-
     }
 }

@@ -1,0 +1,81 @@
+1 It's very good to learning the tests in this assignment, they do a lot of tests by randomly run many functions,
+  and get back the result and do the statistic analyze, I found the outcomes that the last has never swapped,
+  such as "AB", "BAC", "CBAD". In this case, it's easy to find where the issue is.
+
+  for (int x = 0; x < (last - 1 + q.length - first) % q.length; x++)
+
+  ===>
+
+  for (int x = 0; x < (last - 1 + q.length - first) % q.length + 1; x++)
+
+
+
+  Test 15: check randomness of iterator() by enqueueing n items, iterating over those
+           n items, and seeing whether each of the n! permutations is equally likely
+    * n = 2, trials = 12000
+
+              value  observed  expected   2*O*ln(O/E)
+          -------------------------------------------
+                 AB     12000    6000.0      16635.53
+                 BA         0    6000.0          0.00
+          -------------------------------------------
+                        12000   12000.0      16635.53
+
+      G-statistic = 16635.53 (p-value = 0.000000, reject if p-value <= 0.0001)
+      Note: a correct solution will fail this test by bad luck 1 time in 10,000.
+
+    * n = 3, trials = 12000
+
+              value  observed  expected   2*O*ln(O/E)
+          -------------------------------------------
+                ABC      6027    2000.0      13296.79
+                ACB         0    2000.0          0.00
+                BAC      5973    2000.0      13070.14
+                BCA         0    2000.0          0.00
+                CAB         0    2000.0          0.00
+                CBA         0    2000.0          0.00
+          -------------------------------------------
+                        12000   12000.0      26366.94
+
+      G-statistic = 26366.94 (p-value = 0.000000, reject if p-value <= 0.0001)
+      Note: a correct solution will fail this test by bad luck 1 time in 10,000.
+
+    * n = 4, trials = 12000
+
+              value  observed  expected   2*O*ln(O/E)
+          -------------------------------------------
+               ABCD      1967     500.0       5388.23
+               ABDC         0     500.0          0.00
+               ACBD      1992     500.0       5507.03
+               ACDB         0     500.0          0.00
+               ADBC         0     500.0          0.00
+               ADCB         0     500.0          0.00
+               BACD      2003     500.0       5559.50
+               BADC         0     500.0          0.00
+               BCAD      2016     500.0       5621.67
+               BCDA         0     500.0          0.00
+               BDAC         0     500.0          0.00
+               BDCA         0     500.0          0.00
+               CABD      1995     500.0       5521.33
+               CADB         0     500.0          0.00
+               CBAD      2027     500.0       5674.40
+               CBDA         0     500.0          0.00
+               CDAB         0     500.0          0.00
+               CDBA         0     500.0          0.00
+               DABC         0     500.0          0.00
+               DACB         0     500.0          0.00
+               DBAC         0     500.0          0.00
+               DBCA         0     500.0          0.00
+               DCAB         0     500.0          0.00
+               DCBA         0     500.0          0.00
+          -------------------------------------------
+                        12000   12000.0      33272.15
+
+      G-statistic = 33272.15 (p-value = 0.000000, reject if p-value <= 0.0001)
+      Note: a correct solution will fail this test by bad luck 1 time in 10,000.
+
+    * n = 5, trials = 12000
+
+  ==> FAILED
+
+
