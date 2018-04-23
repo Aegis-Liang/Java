@@ -90,9 +90,8 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         }
 
         Item[] Result = (Item[]) new Object[q.length];
-        for (int i=0;i<q.length;i++)
-        {
-            Result[i] = q[i];
+        for (int i=0;i<this.n;i++) {
+            Result[i] = q[(first + i) % q.length];
         }
 
         return new ArrayIterator(Result);
@@ -101,12 +100,11 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     // an iterator, doesn't implement remove() since it's optional
     private class ArrayIterator implements Iterator<Item> {
         private int i;
-        private Item[] ItemRef;
+        private Item[] itemRef;
 
-        public ArrayIterator(Item[] Result)
-        {
+        public ArrayIterator(Item[] result) {
             this.i = 0;
-            this.ItemRef = Result;
+            this.itemRef = result;
         }
 
         public boolean hasNext() {
@@ -119,7 +117,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
         public Item next() {
             if (!hasNext()) throw new NoSuchElementException();
-            Item item = ItemRef[(i + first) % ItemRef.length];
+            Item item = itemRef[i];
             i++;
             return item;
         }
@@ -134,8 +132,6 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 //                randQueue.enqueue(item);
 //            else if (!randQueue.isEmpty())
 //                StdOut.print(randQueue.dequeue() + " ");
-//
-//
 //            StdOut.println("(" + randQueue.size() + " left on queue)");
 //        }
 //        Iterator<String> randIter = randQueue.iterator();

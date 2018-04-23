@@ -79,3 +79,143 @@
   ==> FAILED
 
 
+2. Test 9: create two nested iterators over the same randomized queue
+     * n = 10
+       - outer iterator failed to return one (or more) of the 10 items
+       - outer iterator returned the same item more than once
+
+     * n = 50
+       - outer iterator failed to return one (or more) of the 50 items
+       - outer iterator returned the same item more than once
+
+   ==> FAILED
+
+   Test 10: create two parallel iterators over the same randomized queue
+     * n = 10
+       - two iterators return the same sequence of values
+       - they should return the same set of values but in a
+         different order
+
+     * n = 50
+       - two iterators return the same sequence of values
+       - they should return the same set of values but in a
+         different order
+
+   ==> FAILED
+
+
+            RandomizedQueue<Integer> q = new RandomizedQueue<Integer>();
+
+            q.enqueue(2);
+            q.enqueue(3);
+            q.enqueue(1);
+            q.enqueue(0);
+            q.enqueue(4);
+            q.enqueue(5);
+
+            Iterator<Integer> it = q.iterator();
+            Iterator<Integer> it2 = q.iterator();
+
+            while (it.hasNext())
+                System.out.println("Iterator it " + it.next());
+
+            while (it2.hasNext())
+                System.out.println("Iterator it2 " + it2.next());
+
+   Observe that two iterators are returning exactly the same sequence. Not really random, is it?)) The issue here is pointed out by the assignment:
+
+   Additionally, your iterator implementation must support operations next() and hasNext() in constant worst-case time; and construction in linear time; you may (and will need to) use a linear amount of extra memory per iterator.
+
+
+   This could get 100 scores, but I don't think it's good enough since it copies the null items.
+
+        public Iterator<Item> iterator() {
+           for (int x = 0; x < (last - 1 + q.length - first) % q.length + 1; x++) { // need +1 at the end, otherwise the last item didn't swap
+               int offsetChose = StdRandom.uniform(x + 1);
+               int indexX = (x + first) % q.length;
+               int indexChose = (offsetChose + first) % q.length;
+               Item temp = q[indexChose];
+               q[indexChose] = q[indexX];
+               q[indexX] = temp;
+           }
+
+           Item[] Result = (Item[]) new Object[q.length];
+           for (int i=0;i<q.length;i++)
+           {
+               Result[i] = q[i];
+           }
+
+           return new ArrayIterator(Result);
+       }
+
+       // an iterator, doesn't implement remove() since it's optional
+       private class ArrayIterator implements Iterator<Item> {
+           private int i;
+           private Item[] ItemRef;
+
+           public ArrayIterator(Item[] Result)
+           {
+               this.i = 0;
+               this.ItemRef = Result;
+           }
+
+           public boolean hasNext() {
+               return i < n;
+           }
+
+           public void remove() {
+               throw new UnsupportedOperationException();
+           }
+
+           public Item next() {
+               if (!hasNext()) throw new NoSuchElementException();
+               Item item = ItemRef[(i + first) % ItemRef.length];
+               i++;
+               return item;
+           }
+       }
+
+   This guy is perfect:
+    public Iterator<Item> iterator() {
+        for (int x = 0; x < (last - 1 + q.length - first) % q.length + 1; x++) { // need +1 at the end, otherwise the last item didn't swap
+            int offsetChose = StdRandom.uniform(x + 1);
+            int indexX = (x + first) % q.length;
+            int indexChose = (offsetChose + first) % q.length;
+            Item temp = q[indexChose];
+            q[indexChose] = q[indexX];
+            q[indexX] = temp;
+        }
+
+        Item[] Result = (Item[]) new Object[q.length];
+        for (int i=0;i<this.n;i++) {
+            Result[i] = q[(first + i) % q.length];
+        }
+
+        return new ArrayIterator(Result);
+    }
+
+    // an iterator, doesn't implement remove() since it's optional
+    private class ArrayIterator implements Iterator<Item> {
+        private int i;
+        private Item[] itemRef;
+
+        public ArrayIterator(Item[] result) {
+            this.i = 0;
+            this.itemRef = result;
+        }
+
+        public boolean hasNext() {
+            return i < n;
+        }
+
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+
+        public Item next() {
+            if (!hasNext()) throw new NoSuchElementException();
+            Item item = itemRef[i];
+            i++;
+            return item;
+        }
+    }
