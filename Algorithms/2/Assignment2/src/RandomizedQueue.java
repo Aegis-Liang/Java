@@ -72,8 +72,8 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     }
 
     public Iterator<Item> iterator() {
-        for (int x = first; x < (last+ q.length) % q.length; x++) { // last maybe less than first, for getting correct loop count, add and mod q.length
-            int indexChose = (first + StdRandom.uniform(x - first + q.length)) % q.length; // + q.length for avoiding x - first less than 0
+        for (int x = first; x < (last-1 + this.n) % q.length; x++) { // last maybe less than first, for getting correct loop count, add and mod q.length
+            int indexChose = (first + StdRandom.uniform(x - first + this.n)) % q.length; // + q.length for avoiding x - first less than 0, cannot plus q.length since some items are null in the q
             Item temp = q[indexChose];
             q[indexChose] = q[x];
             q[x] = temp;
@@ -115,5 +115,8 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
             StdOut.println("(" + randQueue.size() + " left on queue)");
         }
+        Iterator<String> randIter = randQueue.iterator();
+        for(int i=0;i<3;i++)
+            System.out.println(randIter.next());
     }
 }

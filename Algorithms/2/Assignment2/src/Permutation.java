@@ -4,7 +4,8 @@ import edu.princeton.cs.algs4.StdIn;
 public class Permutation {
 
     public static void main(String[] args) {
-        int n = Integer.parseInt(args[0]);
+          int n = Integer.parseInt(args[0]);
+//        int n = 3;
 //        In in = new In(args[0]);
 //        int n = in.readInt();
 
