@@ -72,11 +72,20 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     }
 
     public Iterator<Item> iterator() {
-        for (int x = first; x < (last-1 + this.n) % q.length; x++) { // last maybe less than first, for getting correct loop count, add and mod q.length
-            int indexChose = (first + StdRandom.uniform(x - first + this.n)) % q.length; // + q.length for avoiding x - first less than 0, cannot plus q.length since some items are null in the q
+        // logic is wrong, in " x < "
+//        for (int x = first; x < (last-1 + this.n) % q.length; x++) { // last maybe less than first, for getting correct loop count, add and mod q.length
+//            int indexChose = (first + StdRandom.uniform(x - first + this.n)) % q.length; // + q.length for avoiding x - first less than 0, cannot plus q.length since some items are null in the q
+//            Item temp = q[indexChose];
+//            q[indexChose] = q[x];
+//            q[x] = temp;
+//        }
+        for(int x=0; x < (last-1  + q.length - first) % q.length; x++) {
+            int offsetChose = StdRandom.uniform(x+1);
+            int indexX = (x + first) %  q.length;
+            int indexChose = (offsetChose + first) % q.length;
             Item temp = q[indexChose];
-            q[indexChose] = q[x];
-            q[x] = temp;
+            q[indexChose] = q[indexX];
+            q[indexX] = temp;
         }
         return new ArrayIterator();
     }
@@ -116,7 +125,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
             StdOut.println("(" + randQueue.size() + " left on queue)");
         }
         Iterator<String> randIter = randQueue.iterator();
-        for(int i=0;i<3;i++)
+        while(randIter.hasNext())
             System.out.println(randIter.next());
     }
 }
