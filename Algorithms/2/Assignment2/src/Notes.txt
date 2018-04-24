@@ -219,3 +219,74 @@
             return item;
         }
     }
+
+3.  Test 3 (bonus): check that maximum size of any or Deque or RandomizedQueue object
+                    created is equal to k
+      * filename = tale.txt, n = 138653, k = 5
+        - max size of RandomizedQueue object = 138653
+
+      * filename = tale.txt, n = 138653, k = 50
+        - max size of RandomizedQueue object = 138653
+
+      * filename = tale.txt, n = 138653, k = 500
+        - max size of RandomizedQueue object = 138653
+
+      * filename = tale.txt, n = 138653, k = 5000
+        - max size of RandomizedQueue object = 138653
+
+      * filename = tale.txt, n = 138653, k = 50000
+        - max size of RandomizedQueue object = 138653
+
+    ==> FAILED
+
+
+    This test is for the permutation client, where the task is to print k items out of n, uniformly chosen.
+
+    The challenge is now to only use memory proportional to k instead of to n. Think of n as hideous large, but k comparably small.
+    We are only interested in the k items any way, so why store all n? :)
+
+
+    Solution:
+    1) Input first k numbers into randomized queue. This will make sure all the randomized queue slots have element (no empty slot).
+    2) Randomly generates a number that the index which current item need to swap.
+    3) If above number is less than k, dequeue an item from the queue, and enqueue the current item into the queue.
+    4) Dequeue all number from the queue for the output since the dequeue function is random.
+
+    below code could solve this problem:
+    
+    public static void main(String[] args) {
+            int k = Integer.parseInt(args[0]);
+    //        int k = 3;
+            int c = 0;
+
+    //        In in = new In(args[0]);
+    //        int n = in.readInt();
+
+    //        RandomizedQueue<String> randQueue = new RandomizedQueue<>();
+    //        while (!StdIn.isEmpty()) {
+    //            String str = StdIn.readString();
+    //            randQueue.enqueue(str);
+    //        }
+
+    //        Iterator<String> randIter = randQueue.iterator();
+    //        for (int i = 0; i < n; i++)
+    //            System.out.println(randIter.next());
+            RandomizedQueue<String> randQueue = new RandomizedQueue<>();
+            for (int i = 0; i < k; i++) {
+                String str = StdIn.readString();
+                randQueue.enqueue(str);
+                c++;
+            }
+            while (!StdIn.isEmpty()) {
+                String str = StdIn.readString();
+                int x = StdRandom.uniform(c + 1); // if you gonna use uniform, must to add 1 to avoid c = 0
+                if (x < k) {
+                    randQueue.dequeue();
+                    randQueue.enqueue(str);
+                }
+                c++;
+            }
+            for (int i = 0; i < k; i++) {
+                System.out.println(randQueue.dequeue());
+            }
+        }
