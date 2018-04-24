@@ -253,7 +253,7 @@
     4) Dequeue all number from the queue for the output since the dequeue function is random.
 
     below code could solve this problem:
-    
+
     public static void main(String[] args) {
             int k = Integer.parseInt(args[0]);
     //        int k = 3;
@@ -290,3 +290,5 @@
                 System.out.println(randQueue.dequeue());
             }
         }
+
+4. E:\Java\Algorithms\2\Assignment2\out\production\Assignment2> java -classpath ".;C:\Users\Aegis\algs4\algs4.jar" Permutation 3 < duplicates.txt
