@@ -1,0 +1,88 @@
+1. Test 10: check that data type is immutable by testing whether each method
+            returns the same value, regardless of any intervening operations
+     * input8.txt
+       - failed after 27 operations involving BruteCollinearPoints
+       - first and last call to segments() returned different arrays
+
+       - failed on trial 1 of 100
+
+     * equidistant.txt
+       - failed after 9 operations involving BruteCollinearPoints
+       - first and last call to segments() returned different arrays
+
+       - sequence of operations was:
+             BruteCollinearPoints collinear = new BruteCollinearPoints(points);
+             collinear.numberOfSegments() -> 4
+             mutate points[] array that was passed to constructor
+             mutate points[] array that was passed to constructor
+             collinear.numberOfSegments() -> 4
+             collinear.segments()
+             collinear.numberOfSegments() -> 4
+             mutate array returned by last call to segments()
+             collinear.segments()
+
+       - failed on trial 1 of 100
+
+   ==> FAILED
+
+   Because the linkedlist is empty when the segment function is call in the second or more time.
+   Developer always make this bug and hard to knowing this.
+
+      public LineSegment[] segments()
+       {
+           LineSegment[] result = new LineSegment[this.numLineSegments];
+           for(int i=0; i<this.numLineSegments;i++)
+               result[i] = this.llistLineSegment.pop();
+           return result;
+       }
+
+
+
+
+   Test 10: check that data type is immutable by testing whether each method
+            returns the same value, regardless of any intervening operations
+     * input8.txt
+       - failed after 9 operations involving BruteCollinearPoints
+       - first and last call to segments() returned different arrays
+
+       - sequence of operations was:
+             BruteCollinearPoints collinear = new BruteCollinearPoints(points);
+             collinear.numberOfSegments() -> 2
+             collinear.segments()
+             collinear.segments()
+             collinear.segments()
+             collinear.segments()
+             mutate array returned by last call to segments()
+             mutate array returned by last call to segments()
+             collinear.segments()
+
+       - failed on trial 1 of 100
+
+     * equidistant.txt
+       - failed after 12 operations involving BruteCollinearPoints
+       - first and last call to segments() returned different arrays
+
+       - sequence of operations was:
+             BruteCollinearPoints collinear = new BruteCollinearPoints(points);
+             mutate points[] array that was passed to constructor
+             mutate points[] array that was passed to constructor
+             mutate points[] array that was passed to constructor
+             collinear.segments()
+             mutate points[] array that was passed to constructor
+             collinear.segments()
+             collinear.segments()
+             mutate array returned by last call to segments()
+             mutate array returned by last call to segments()
+             collinear.numberOfSegments() -> 4
+             collinear.segments()
+
+       - failed on trial 1 of 100
+
+   ==> FAILED
+
+    Because the segment function returns a reference not a value, its data type is mutable.
+
+    public LineSegment[] segments()
+    {
+        return this.lineSegments;
+    }
