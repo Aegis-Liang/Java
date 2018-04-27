@@ -7,44 +7,52 @@ import edu.princeton.cs.algs4.ResizingArrayQueue;
 
 public class FastCollinearPoints {
     private int numLineSegments;
-//    private LinkedList<LineSegment> llistLineSegment = new LinkedList<>();
     private ResizingArrayQueue<LineSegment> reqLineSegment = new ResizingArrayQueue<>();
-//    private LineSegment[] lineSegments;
-    private ResizingArrayQueue<Point[]> reqResultPoints = new ResizingArrayQueue<>();
+
 
     public FastCollinearPoints(Point[] points) {
-        if(points == null) throw new java.lang.IllegalArgumentException("Point array is null.");
-        for(Point ls : points)
+        if (points == null) throw new java.lang.IllegalArgumentException("Point array is null.");
+        for (Point ls : points)
             if (ls == null) throw new java.lang.IllegalArgumentException("There is a point is null.");
 
         this.numLineSegments = 0;
-        Point[] copyPoints =  points.clone();
+        Point[] copyPoints = points.clone();
 
         this.numLineSegments = 0;
 
         Arrays.sort(copyPoints);
 
-        for (int a=0; a<copyPoints.length-1;a++)
-            if(copyPoints[a].compareTo(copyPoints[a+1]) == 0) throw new java.lang.IllegalArgumentException("Repeat points");
+        for (int a = 0; a < copyPoints.length - 1; a++)
+            if (copyPoints[a].compareTo(copyPoints[a + 1]) == 0)
+                throw new java.lang.IllegalArgumentException("Repeat points");
 
         int length = points.length;
-        // origin point
+        // base point
         for (int i = 0; i < length - 3; i++) {
             Point pointI = copyPoints[i];
 
-            Point[] slopes = Arrays.copyOfRange(copyPoints, i + 1, length);
-            Arrays.sort(slopes, pointI.slopeOrder());
+            //Point[] slopesSecondHalf = Arrays.copyOfRange(copyPoints, i + 1, length);
+            Point[] slopes1stHalf = Arrays.copyOfRange(copyPoints, 0, i);
+            Arrays.sort(slopes1stHalf, pointI.slopeOrder());
+            double[] slopes = new double[slopes1stHalf.length];
+            for (int a = 0; a < slopes.length; a++)
+                slopes[a] = slopes1stHalf[a].slopeTo(pointI);
+            Arrays.sort(slopes);
+
+            Point[] slopes2ndHalf = Arrays.copyOfRange(copyPoints, i + 1, length);
+            Arrays.sort(slopes2ndHalf, pointI.slopeOrder());
+
 
             // start point
-            for (int j = 0; j < slopes.length; j++) {
+            for (int j = 0; j < slopes2ndHalf.length; j++) {
                 int count = 0;
-                Point pointJ = slopes[j];
+                Point pointJ = slopes2ndHalf[j];
                 double slopeJ = pointI.slopeTo(pointJ);
 
                 int cursor = j + 1;
-                while (cursor < slopes.length) {
+                while (cursor < slopes2ndHalf.length) {
                     // slope equals pointJ
-                    Point pointCursor = slopes[cursor];
+                    Point pointCursor = slopes2ndHalf[cursor];
                     if (pointI.slopeTo(pointCursor) == slopeJ) {
                         count++;
                         cursor++;
@@ -53,26 +61,14 @@ public class FastCollinearPoints {
                 }
                 // add to link list
                 if (count >= 2) {
-                    Point pointPrevious = slopes[cursor - 1];
+                    Point pointPrevious = slopes2ndHalf[cursor - 1];
 //                    this.reqLineSegment.enqueue(new LineSegment(pointI, pointPrevious));
-
-                    Boolean isIncluded = false;
-                    for(Point[] linePoints: this.reqResultPoints)
-                    {
-                        if(linePoints[1] == pointPrevious && linePoints[0].slopeTo(linePoints[1] ) == pointI.slopeTo(pointPrevious)) {
-                            isIncluded = true;
-                            break;
-                        }
-                    }
-                    if(!isIncluded) {
-
-                        this.reqResultPoints.enqueue(new Point[]{
-                                pointI, pointPrevious
-                        });
+//                    this.numLineSegments++;
+                    if (Arrays.binarySearch(slopes, slopeJ) < 0) {
                         this.reqLineSegment.enqueue(new LineSegment(pointI, pointPrevious));
-
                         this.numLineSegments++;
                     }
+
 
 //                    this.llistLineSegment.add(new LineSegment(pointI, slopes[j]));
 //                    this.numLineSegments++;
@@ -102,10 +98,8 @@ public class FastCollinearPoints {
             result[count++] = ls;
         }
 
-
         return result;
     }
-
 
 
     public static void main(String[] args) {

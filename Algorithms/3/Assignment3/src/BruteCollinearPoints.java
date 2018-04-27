@@ -10,7 +10,6 @@ public class BruteCollinearPoints {
     private int numLineSegments;
     //    private LinkedList<LineSegment> llistLineSegment= new LinkedList<>();
     private ResizingArrayStack<LineSegment> resLineSegment = new ResizingArrayStack<>();
-    private LineSegment[] lineSegments;
 
     public BruteCollinearPoints(Point[] points) {
 

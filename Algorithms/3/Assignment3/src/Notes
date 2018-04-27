@@ -122,6 +122,12 @@
 
     1) LineSegment.java cannot be modified, no sorting interface is supported.
     2) LineSegment.java cannot be modified, no property can be get, it only provides method to string to print "p -> q".
+    3) Store the points which are in result collinear lines, this will make the correctness score full, but miss 2 score in timing since it's more complex in the construct function.
 
-
-
+    Solution: 1) Sort all the input points, make sure the base point starts from origin point.
+              2) Loop the base points.
+              3) Split the points to 2 arrays, one for storing left elements to base point, the other for the right.
+              4) Calculates the slopes that the left elements to the base point, and store them into slopes array.
+              5) If a collinear line is found in right array, calculate the slope.
+              6) If the slope could be found in left array, that means the line is already included, skip to next.
+                 Otherwise put this line into result.
