@@ -3,13 +3,14 @@ import java.util.LinkedList;
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdOut;
-import edu.princeton.cs.algs4.ResizingArrayStack;
+import edu.princeton.cs.algs4.ResizingArrayQueue;
 
 public class FastCollinearPoints {
     private int numLineSegments;
 //    private LinkedList<LineSegment> llistLineSegment = new LinkedList<>();
-    private ResizingArrayStack<LineSegment> resLineSegment = new ResizingArrayStack<>();
-    private LineSegment[] lineSegments;
+    private ResizingArrayQueue<LineSegment> reqLineSegment = new ResizingArrayQueue<>();
+//    private LineSegment[] lineSegments;
+    private ResizingArrayQueue<Point[]> reqResultPoints = new ResizingArrayQueue<>();
 
     public FastCollinearPoints(Point[] points) {
         if(points == null) throw new java.lang.IllegalArgumentException("Point array is null.");
@@ -53,8 +54,25 @@ public class FastCollinearPoints {
                 // add to link list
                 if (count >= 2) {
                     Point pointPrevious = slopes[cursor - 1];
-                    this.resLineSegment.push(new LineSegment(pointI, pointPrevious));
-                    this.numLineSegments++;
+//                    this.reqLineSegment.enqueue(new LineSegment(pointI, pointPrevious));
+
+                    Boolean isIncluded = false;
+                    for(Point[] linePoints: this.reqResultPoints)
+                    {
+                        if(linePoints[1] == pointPrevious && linePoints[0].slopeTo(linePoints[1] ) == pointI.slopeTo(pointPrevious)) {
+                            isIncluded = true;
+                            break;
+                        }
+                    }
+                    if(!isIncluded) {
+
+                        this.reqResultPoints.enqueue(new Point[]{
+                                pointI, pointPrevious
+                        });
+                        this.reqLineSegment.enqueue(new LineSegment(pointI, pointPrevious));
+
+                        this.numLineSegments++;
+                    }
 
 //                    this.llistLineSegment.add(new LineSegment(pointI, slopes[j]));
 //                    this.numLineSegments++;
@@ -80,16 +98,21 @@ public class FastCollinearPoints {
 
         LineSegment[] result = new LineSegment[this.numLineSegments];
         int count = 0;
-        for (LineSegment ls : this.resLineSegment)
+        for (LineSegment ls : this.reqLineSegment) {
             result[count++] = ls;
+        }
+
+
         return result;
     }
+
+
 
     public static void main(String[] args) {
 
         // read the n points from a file
 //        In in = new In(args[0]);
-        In in = new In("input9.txt");
+        In in = new In("inputMy.txt");
         int n = in.readInt();
         Point[] points = new Point[n];
         for (int i = 0; i < n; i++) {
