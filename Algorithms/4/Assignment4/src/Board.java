@@ -10,6 +10,10 @@ public class Board {
 
     public Board(int[][] blocks)           // construct a board from an n-by-n array of blocks
     {                                      // (where blocks[i][j] = block in row i, column j)
+
+        if (blocks == null)
+            throw new java.lang.IllegalArgumentException("blocks is null!");
+
         this.n = blocks.length;            // no need to use sqrt
         this.tiles = new int[n][n];
         for (int r = 0; r < this.n; r++)

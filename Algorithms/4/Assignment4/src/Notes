@@ -64,3 +64,71 @@
               if(snCurrent.predecessor == null || !snCurrent.predecessor.board.equals(boardNeighbor))
                   pq.insert(new SearchNode(boardNeighbor, moveNeighbor, snCurrent));
           }
+
+
+3. Test 4b: count Board operations (that should get called),
+            rejecting if doesn't adhere to stricter caching limits
+
+                  filename    Board()            equals()         manhattan()
+   --------------------------------------------------------------------------
+   => FAILED  puzzle20.txt       2289                2279               19593   (4.9x)
+   => FAILED  puzzle22.txt       5549                5543               55223   (5.7x)
+   => FAILED  puzzle21.txt       5619                5611               56779   (5.8x)
+   => FAILED  puzzle23.txt       8445                8437               84891   (5.7x)
+   => FAILED  puzzle24.txt       8683                8673               90319   (5.9x)
+   => FAILED  puzzle25.txt      16416               16408              178407   (6.2x)
+   => FAILED  puzzle27.txt      17947               17939              196755   (6.3x)
+   => FAILED  puzzle29.txt      18711               18703              215665   (6.6x)
+   => FAILED  puzzle26.txt      18990               18984              216419   (6.5x)
+   => FAILED  puzzle28.txt      43202               43192              556059   (7.4x)
+   => FAILED  puzzle30.txt      69148               69142              918633   (7.6x)
+   => FAILED  puzzle31.txt      73809               73801              973639   (7.5x)
+   => FAILED  puzzle39.txt     106459              106451             1330491   (7.1x)
+   => FAILED  puzzle41.txt     166497              166487             2267133   (7.8x)
+   => FAILED  puzzle34.txt     224829              224823             3230903   (8.2x)
+   => FAILED  puzzle37.txt     246893              246885             3510733   (8.1x)
+   => FAILED  puzzle44.txt     398823              398813             5790137   (8.3x)
+   => FAILED  puzzle32.txt     771088              771078            12703027   (9.4x)
+   => FAILED  puzzle35.txt     785712              785702            12448947   (9.1x)
+   => FAILED  puzzle33.txt     921232              921224            15272641   (9.5x)
+   => FAILED  puzzle43.txt    1565635             1565627            25775637   (9.4x)
+   => FAILED  puzzle46.txt    1549058             1549050            25679235   (9.5x)
+   => FAILED  puzzle40.txt    1649907             1649901            27742359   (9.6x)
+   => FAILED  puzzle36.txt    3097813             3097803            56218043  (10.4x)
+   => FAILED  puzzle45.txt    3607829             3607821            63336317  (10.0x)
+   ==> 0/25 tests passed
+
+
+   Total: 100/125 tests passed!
+
+
+
+   Just record that the checklist has something about cache and look for it, found:
+
+   Cache either the Manhattan distance of a board (or Manhattan priority of a search node).
+   It is waste to recompute the same quantity over and over again.
+
+   After think about it, the compareTo() function is called many times, it's worthy to pre-calculate it.
+   The priority and manhattan are added for fixing this issue.
+
+       private class SearchNode implements Comparable<SearchNode>
+       {
+           private Board board;
+           private int move;
+           private SearchNode predecessor;
+           private int priority;
+           private int manhattan;
+       }
+
+4. Is the isGoal of Board class could be optimize? Initial a Goal board and compare it, it will save time to check
+   the hamming every time, or store the hamming for caching.
+
+5. Use a parity argument to determine whether a puzzle is unsolvable (instead of two synchronous A* searches).
+   Later it's better to get understand the parity check for whether a board is unsolvable.
+
+6. How can I reduce the amount of memory a Board uses? For starters, recall that an n-by-n int[][] array in Java uses about 24 + 32n + 4n^2 bytes;
+   when n equals 3, this is 156 bytes. To save memory, consider using an n-by-n char[][] array or a length n^2 char[] array.
+   You could use a more elaborate representation: since each board is a permutation of length n^2,
+   in principle, you need only about lg ((n^2)!) bits to represent it; when n equals 3, this is only 19 bits.
+
+   Consider how to store n = equals 3 in 19 bits.

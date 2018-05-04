@@ -11,23 +11,30 @@ public class Solver {
 
     private class SearchNode implements Comparable<SearchNode>
     {
-
-
-        Board board;
-        int move;
-        SearchNode predecessor;
+        private Board board;
+        private int move;
+        private SearchNode predecessor;
+        private int priority;
+        private int manhattan;
 
         public SearchNode(Board board, int move, SearchNode predecessor) {
+            if (board == null)
+                throw new java.lang.IllegalArgumentException("blocks is null!");
+
             this.board = board;
             this.move = move;
             this.predecessor = predecessor;
+
+            this.manhattan = this.board.manhattan();
+            this.priority = this.manhattan + this.move;
         }
 
         public int compareTo(SearchNode that)
         {
-            int priorityThis = this.board.manhattan() + this.move;
-            int priorityThat = that.board.manhattan() + that.move;
-            return priorityThis - priorityThat;
+//            int priorityThis = this.board.manhattan() + this.move;
+//            int priorityThat = that.board.manhattan() + that.move;
+//            return priorityThis - priorityThat;
+            return this.priority - that.priority;
         }
     }
 
