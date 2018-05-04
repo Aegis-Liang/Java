@@ -196,5 +196,7 @@ public class Board {
         {
             StdOut.println(b);
         }
+
+        StdOut.println(initial.twin());
     }
 }

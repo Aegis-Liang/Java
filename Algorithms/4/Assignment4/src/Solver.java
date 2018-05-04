@@ -9,6 +9,7 @@ public class Solver {
     private int moveSolve;
     private MinPQ<SearchNode> pq = new MinPQ<>();
     private Stack<Board> stackBoard = new Stack<>();
+    private MinPQ<SearchNode> pqTwin = new MinPQ<>();
 
     private class SearchNode implements Comparable<SearchNode>
     {
@@ -39,10 +40,13 @@ public class Solver {
 
         SearchNode sn = new SearchNode(initial, 0, null);
         this.pq.insert(sn);
+        SearchNode snTwin = new SearchNode(initial.twin(), 0, null);
+        this.pqTwin.insert(snTwin);
 
         while(true)
         {
             SearchNode snCurrent = this.pq.delMin();
+            SearchNode snCurrentTwin = this.pqTwin.delMin();
 
             if(snCurrent.board.isGoal())
             {
@@ -59,11 +63,24 @@ public class Solver {
                 break;
             }
 
+            if(snCurrentTwin.board.isGoal())
+            {
+                this.isSolvable = false;
+                this.moveSolve = -1;
+                break;
+            }
+
 
             int moveNeighbor = snCurrent.move+1;
             for (Board boardNeighbor : snCurrent.board.neighbors() )
             {
                 this.pq.insert(new SearchNode(boardNeighbor, moveNeighbor, snCurrent));
+            }
+
+            int moveNeighborTwin = snCurrentTwin.move+1;
+            for (Board boardNeighbor : snCurrentTwin.board.neighbors() )
+            {
+                this.pqTwin.insert(new SearchNode(boardNeighbor, moveNeighborTwin, snCurrentTwin));
             }
         }
     }
@@ -89,7 +106,7 @@ public class Solver {
     public static void main(String[] args) // solve a slider puzzle (given below)
     {
         // create initial board from file
-        In in = new In("puzzle3x3-01.txt");
+        In in = new In("puzzle2x2-unsolvable1.txt");
         int n = in.readInt();
         int[][] blocks = new int[n][n];
         for (int i = 0; i < n; i++)
