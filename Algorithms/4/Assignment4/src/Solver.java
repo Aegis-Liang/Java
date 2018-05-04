@@ -7,12 +7,12 @@ public class Solver {
 
     private boolean isSolvable;
     private int moveSolve;
-    private MinPQ<SearchNode> pq = new MinPQ<>();
     private Stack<Board> stackBoard = new Stack<>();
-    private MinPQ<SearchNode> pqTwin = new MinPQ<>();
 
     private class SearchNode implements Comparable<SearchNode>
     {
+
+
         Board board;
         int move;
         SearchNode predecessor;
@@ -35,18 +35,21 @@ public class Solver {
 
     public Solver(Board initial)           // find a solution to the initial board (using the A* algorithm)
     {
+        MinPQ<SearchNode> pq = new MinPQ<>();
+        MinPQ<SearchNode> pqTwin = new MinPQ<>();
+
         this.isSolvable = false;
         this.moveSolve = -1;
 
         SearchNode sn = new SearchNode(initial, 0, null);
-        this.pq.insert(sn);
+        pq.insert(sn);
         SearchNode snTwin = new SearchNode(initial.twin(), 0, null);
-        this.pqTwin.insert(snTwin);
+        pqTwin.insert(snTwin);
 
         while(true)
         {
-            SearchNode snCurrent = this.pq.delMin();
-            SearchNode snCurrentTwin = this.pqTwin.delMin();
+            SearchNode snCurrent = pq.delMin();
+            SearchNode snCurrentTwin = pqTwin.delMin();
 
             if(snCurrent.board.isGoal())
             {
@@ -74,13 +77,15 @@ public class Solver {
             int moveNeighbor = snCurrent.move+1;
             for (Board boardNeighbor : snCurrent.board.neighbors() )
             {
-                this.pq.insert(new SearchNode(boardNeighbor, moveNeighbor, snCurrent));
+                if(snCurrent.predecessor==null || !snCurrent.predecessor.board.equals(boardNeighbor))
+                    pq.insert(new SearchNode(boardNeighbor, moveNeighbor, snCurrent));
             }
 
             int moveNeighborTwin = snCurrentTwin.move+1;
             for (Board boardNeighbor : snCurrentTwin.board.neighbors() )
             {
-                this.pqTwin.insert(new SearchNode(boardNeighbor, moveNeighborTwin, snCurrentTwin));
+                if(snCurrentTwin.predecessor==null || !snCurrentTwin.predecessor.board.equals(boardNeighbor))
+                    pqTwin.insert(new SearchNode(boardNeighbor, moveNeighborTwin, snCurrentTwin));
             }
         }
     }

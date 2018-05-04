@@ -1,0 +1,12 @@
+1. Funny handling twin() function
+
+    public Board twin()                    // a board that is obtained by exchanging any pair of blocks
+    {
+        Board board2 = new Board(this.tiles);
+
+        if(board2.tiles[0][0]==0 || board2.tiles[0][1]==0)
+            this.swapTiles(board2, 1, 0, 1, 1);
+        else
+            this.swapTiles(board2, 0, 0, 0, 1);
+        return board2;
+    }

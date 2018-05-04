@@ -1,4 +1,3 @@
-import java.lang.Math;
 import edu.princeton.cs.algs4.StdRandom;
 import edu.princeton.cs.algs4.Stack;
 import edu.princeton.cs.algs4.In;
@@ -13,9 +12,9 @@ public class Board {
     {                                      // (where blocks[i][j] = block in row i, column j)
         this.n = blocks.length;            // no need to use sqrt
         this.tiles = new int[n][n];
-        for(int r=0; r<this.n;r++)
-            for(int c=0; c<this.n; c++)
-                this.tiles[r][c]=blocks[r][c];
+        for (int r = 0; r < this.n; r++)
+            for (int c = 0; c < this.n; c++)
+                this.tiles[r][c] = blocks[r][c];
     }
 
 
@@ -31,7 +30,9 @@ public class Board {
         {
             for(int c=0; c<this.n; c++)
             {
-                if(this.tiles[r*n][c]!=r*n+c+1)
+                if(this.tiles[r][c]==0)
+                    continue;
+                if(this.tiles[r][c]!=r*n+c+1)
                     total++;
             }
         }
@@ -74,20 +75,10 @@ public class Board {
     {
         Board board2 = new Board(this.tiles);
 
-        while (true)
-        {
-            int r1 = StdRandom.uniform(board2.n);
-            int c1 = StdRandom.uniform(board2.n);
-            int r2 = StdRandom.uniform(board2.n);
-            int c2 = StdRandom.uniform(board2.n);
-            int tile1 = board2.tiles[r1][c1];
-            int tile2 = board2.tiles[r2][c2];
-            if(tile1!=0 && tile2!=0 && tile1!=tile2)
-            {
-                this.swapTiles(board2, r1, c1, r2, c2);
-                break;
-            }
-        }
+        if(board2.tiles[0][0]==0 || board2.tiles[0][1]==0)
+            this.swapTiles(board2, 1, 0, 1, 1);
+        else
+            this.swapTiles(board2, 0, 0, 0, 1);
         return board2;
     }
 
@@ -104,20 +95,19 @@ public class Board {
 
     public boolean equals(Object y)        // does this board equal y?
     {
-        try {
-            Board board2 = (Board)y;
-            if(this.n != board2.n)
-                return false;
-            for(int r=0; r<this.n;r++) {
-                for (int c = 0; c < this.n; c++) {
-                    if (this.tiles[r * n][c] != board2.tiles[r * n][c])
-                        return false;
-                }
-            }
-        }
-        catch (Exception ex)
-        {
+        if (this == y) return true;
+        if (y == null) return false;
+        if (y.getClass() != this.getClass()) return false;
+
+        Board board2 = (Board) y;
+        if (this.n != board2.n)
             return false;
+
+        for (int r = 0; r < this.n; r++) {
+            for (int c = 0; c < this.n; c++) {
+                if (this.tiles[r][c] != board2.tiles[r][c])
+                    return false;
+            }
         }
         return true;
     }
@@ -182,7 +172,7 @@ public class Board {
     public static void main(String[] args) // unit tests (not graded)
     {
         // create initial board from file
-        In in = new In("puzzle3x3-01.txt");
+        In in = new In("puzzle04.txt");
         int n = in.readInt();
         int[][] blocks = new int[n][n];
         for (int i = 0; i < n; i++)
@@ -191,6 +181,9 @@ public class Board {
         Board initial = new Board(blocks);
         StdOut.println(initial);
         StdOut.println(initial.manhattan());
+        StdOut.println(initial.hamming());
+        StdOut.println(initial.twin());
+        StdOut.println(initial);
 
         for(Board b : initial.neighbors())
         {
