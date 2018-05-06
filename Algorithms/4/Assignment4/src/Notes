@@ -132,3 +132,24 @@
    in principle, you need only about lg ((n^2)!) bits to represent it; when n equals 3, this is only 19 bits.
 
    Consider how to store n = equals 3 in 19 bits.
+
+7. Equals() implementation should be like following, this is talked about in
+
+    public boolean equals(Object y)        // does this board equal y?
+    {
+        if (this == y) return true;
+        if (y == null) return false;
+        if (y.getClass() != this.getClass()) return false;
+
+        Board board2 = (Board) y;
+        if (this.n != board2.n)
+            return false;
+
+        for (int r = 0; r < this.n; r++) {
+            for (int c = 0; c < this.n; c++) {
+                if (this.tiles[r][c] != board2.tiles[r][c])
+                    return false;
+            }
+        }
+        return true;
+    }
