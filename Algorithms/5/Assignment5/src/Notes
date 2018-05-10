@@ -1,0 +1,9 @@
+1. At first I don't know what is the order to insert to red-black tree, and red-black tree requires the key and value.
+   These make me so confusing, finally I tried input the whole Point2D as key could work fine, and the Point2D has default comparable interface.
+
+2. for(Point2D p : this.rb.keys(lo, hi))
+       if(p.x()>=rect.xmin() && p.x()<=rect.xmax()&& p.y()>=rect.ymin()&& p.y()<=rect.ymax())
+            stack.push(p);
+
+   This part need to verify whether each point is in the rectangle, otherwise all Point2D ymin <= y <= ymax is considered
+   in the rectangle since the comparable of Point2D is consider y axis first.
