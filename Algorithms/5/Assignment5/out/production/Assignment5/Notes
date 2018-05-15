@@ -7,3 +7,23 @@
 
    This part need to verify whether each point is in the rectangle, otherwise all Point2D ymin <= y <= ymax is considered
    in the rectangle since the comparable of Point2D is consider y axis first.
+
+3. private RectHV rect;    // the axis-aligned rectangle corresponding to this node
+
+   The comment has a little hard to understand, my preliminary understanding for the rect is correct but my data
+   structure is hard to be implemented and manipulated because I thought the Node is based on the Point but it's
+   actually based on the Rectangle. Once a point is inserted, the rectangle is divided to 2 pieces, each piece is
+   a new rectangle for the left node or right node.
+
+   private static class Node {
+      private Point2D p;      // the point
+      private RectHV rect;    // the axis-aligned rectangle corresponding to this node
+      private Node lb;        // the left/bottom subtree
+      private Node rt;        // the right/top subtree
+   }
+
+4. Based on last item, consider once a point is added, the point will split the rectangle into 2, and:
+    1) Calculate these 2 rectangles and store them to lb and rt Node? But what about lb and rt's point2D? Null? Trouble...
+    2) Calculate the rectangle When insert the point2D. This seems to be sensible, so the Node is still based on the Point2D.
+       The data structure seemed to be not hard to implement that construct it when do the insert() because you have the
+       parent's information.
