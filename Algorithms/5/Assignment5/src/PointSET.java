@@ -65,7 +65,7 @@ public class PointSET {
 
         for(Point2D p2 : this.rb.keys())
         {
-            double newDistance = p2.distanceTo(p);
+            double newDistance = p2.distanceSquaredTo(p);
             if(newDistance < distance) {
                 result = new Point2D(p2.x(), p2.y());
                 distance = newDistance;

@@ -179,4 +179,33 @@
     That's why it need call the intersects() and contains() function of RectHV. It check the whether the rectangles
     intersect first.
 
-12. 
+12. Test 6a: insert points from file; check nearest() with random query points
+             and check traversal of kd-tree
+      * input5.txt
+        - failed on trial 1 of 1000
+        - performs incorrect traversal of kd-tree during call to nearest()
+        - sequence of points inserted:
+          A  0.7 0.2
+          B  0.5 0.4
+          C  0.2 0.3
+          D  0.4 0.7
+          E  0.9 0.6
+        - query point                   = (0.92, 0.37)
+        - student   nearest()           = (0.9, 0.6)
+        - reference nearest()           = (0.9, 0.6)
+        - student   distanceSquaredTo() = 0.0533
+        - reference distanceSquaredTo() = 0.0533
+        - student sequence of kd-tree nodes involved in calls to distanceSquaredTo():
+          empty
+        - reference sequence of kd-tree nodes involved in calls to distanceSquaredTo():
+          A E B C D
+
+    Point2D also has function about distance implemented.
+    Try a hard way to modify the code. At the beginning I don't want to store the nearest point and its distance since
+    this point will be updated dynamically and it seems this is not a regular way. But afterward I implement it I found
+    the answer get closer even it's still scores 82.
+
+    A lot of thing are modified here:
+    1) Use a global variable to store the information of nearest point and the distance to query point.
+    2) Need to update the information and distance of input node once the recursive nearest() function is called.
+       Otherwise the 

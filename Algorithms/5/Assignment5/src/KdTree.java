@@ -13,8 +13,7 @@ public class KdTree {
         private Node lb;        // the left/bottom subtree
         private Node rt;        // the right/top subtree
 
-        public Node(Point2D p, RectHV rect, Node lb, Node rt)
-        {
+        public Node(Point2D p, RectHV rect, Node lb, Node rt) {
             this.p = p;
             this.rect = rect;
             this.lb = lb;
@@ -56,19 +55,16 @@ public class KdTree {
     {
         if (p == null) throw new IllegalArgumentException("calls insert() with a null p");
 
-        this.root = insert(this.root, p, new RectHV(0, 0, 1,1), 0);
-
+        this.root = insert(this.root, p, new RectHV(0, 0, 1, 1), 0);
     }
 
-    private Node insert(Node x, Point2D p, RectHV rect, int level)
-    {
+    private Node insert(Node x, Point2D p, RectHV rect, int level) {
         // Remark: Only root could be null in the coming recursion
         if (x == null) {
             this.size++;
             return new Node(p, rect, null, null);
-        }
-        else {
-            if(p.x() == x.p.x() && p.y()== x.p.y())
+        } else {
+            if (p.equals(x.p))
                 return x;
             if (level % 2 == 0) {
                 if (p.x() < x.p.x())
@@ -82,34 +78,29 @@ public class KdTree {
                     x.rt = insert(x.rt, p, new RectHV(rect.xmin(), x.p.y(), rect.xmax(), rect.ymax()), level + 1);
             }
         }
-
-
         return x;
-
     }
 
 
     public boolean contains(Point2D p)            // does the set contain point p?
     {
-        return this.get(this.root, p, 0)!= null;
+        if (p == null) throw new java.lang.IllegalArgumentException("p is null.");
+        return this.get(this.root, p, 0) != null;
     }
 
-    private Point2D get(Node x, Point2D p, int level)
-    {
-        if (x==null) return null;
+    private Point2D get(Node x, Point2D p, int level) {
+        if (x == null) return null;
         if (x.p.equals(p)) return p;
         if (level % 2 == 0) {
             if (p.x() < x.p.x())
-                return get(x.lb, p, level+1);
+                return get(x.lb, p, level + 1);
             else
-                return get(x.rt, p, level+1);
-        }
-        else
-        {
+                return get(x.rt, p, level + 1);
+        } else {
             if (p.y() < x.p.y())
-                return get(x.lb, p, level+1);
+                return get(x.lb, p, level + 1);
             else
-                return get(x.rt, p, level+1);
+                return get(x.rt, p, level + 1);
         }
     }
 
@@ -134,6 +125,7 @@ public class KdTree {
 
     public Iterable<Point2D> range(RectHV rect)             // all points that are inside the rectangle (or on the boundary)
     {
+        if (rect == null) throw new java.lang.IllegalArgumentException("rect is null.");
         this.queue = new Queue<>();
         this.range(this.root, rect, 0);
         return this.queue;
@@ -170,36 +162,96 @@ public class KdTree {
     }
 
 
+    private double nearestDistance;
+    private Point2D nearestPoint;
     public Point2D nearest(Point2D p)             // a nearest neighbor in the set to point p; null if the set is empty
     {
+        if (p == null) throw new java.lang.IllegalArgumentException("p is null.");
+        this.nearestDistance = Double.POSITIVE_INFINITY;
+        this.nearestPoint = null;
+
         return this.nearest(this.root, p, 0);
     }
 
-    private Point2D nearest(Node x, Point2D p, int level)
-    {
-        if(x == null) return null;
-        double thisDistance = this.distance(x.p, p);
-        if(level %2 == 0)
+    private Point2D nearest(Node x, Point2D p, int level) {
+        if (x == null) return null;
+        double thisDistance = (x.p == null) ? Double.POSITIVE_INFINITY : x.p.distanceSquaredTo(p);
+        if(thisDistance<this.nearestDistance)
         {
+            this.nearestDistance = thisDistance;
+            this.nearestPoint = x.p;
+        }
+        double lbDistance = (x.lb == null) ? Double.POSITIVE_INFINITY : x.lb.rect.distanceSquaredTo(p);
+        double rtDistance = (x.rt == null) ? Double.POSITIVE_INFINITY : x.rt.rect.distanceSquaredTo(p);
+
+
+        Node nodeQuerySide = null;
+        Node nodeOtherSide = null;
+        double queryRectDistance = Double.POSITIVE_INFINITY;
+        double otherRectDistance = Double.POSITIVE_INFINITY;
+        if (lbDistance < rtDistance) {
+            nodeQuerySide = x.lb;
+            queryRectDistance = lbDistance;
+            nodeOtherSide = x.rt;
+            otherRectDistance = rtDistance;
+        } else {
+            nodeQuerySide = x.rt;
+            queryRectDistance = rtDistance;
+            nodeOtherSide = x.lb;
+            otherRectDistance = lbDistance;
+        }
+
+//        double nearestDistanceTemp = this.nearestDistance;
+
+        Point2D pointQuerySide = null;
+        double queryPointDistance = Double.POSITIVE_INFINITY;
+        if (queryRectDistance < this.nearestDistance) {
+            pointQuerySide = this.nearest(nodeQuerySide, p, level + 1);
+            queryPointDistance = (pointQuerySide == null) ? Double.POSITIVE_INFINITY : pointQuerySide.distanceSquaredTo(p);
+        }
+
+        Point2D pointOtherSide = null;
+        double otherPointDistance = Double.POSITIVE_INFINITY;
+        if (otherRectDistance < this.nearestDistance) {
+            pointOtherSide = this.nearest(nodeOtherSide, p, level + 1);
+        }
+
+        if (queryPointDistance <= this.nearestDistance && queryPointDistance <= otherPointDistance && queryPointDistance <= thisDistance) {
+            this.nearestDistance = queryPointDistance;
+            this.nearestPoint = pointQuerySide;
+            return pointQuerySide;
+        } else if (otherPointDistance <= this.nearestDistance && otherPointDistance <= queryPointDistance && otherPointDistance <= thisDistance) {
+            this.nearestDistance = otherPointDistance;
+            this.nearestPoint =pointOtherSide;
+            return pointOtherSide;
+        }
+          else if (this.nearestDistance <= queryPointDistance && this.nearestDistance<= otherPointDistance && this.nearestDistance<= thisDistance){
+            return this.nearestPoint;
+        } else {
+            this.nearestDistance = thisDistance;
+            this.nearestPoint = x.p;
+            return x.p;
+        }
+
+        /*
+        if (level % 2 == 0) {
             Node nodeQuerySide = null;
             Node nodeOtherSide = null;
-            if(p.x() < x.p.x()) {
+            if (p.x() < x.p.x()) {
                 nodeQuerySide = x.lb;
                 nodeOtherSide = x.rt;
-            }
-            else
-            {
+            } else {
                 nodeQuerySide = x.rt;
                 nodeOtherSide = x.lb;
             }
-            Point2D pointQuerySide = this.nearest(x.lb, p, level + 1);
-            double queryDistance = this.distance(pointQuerySide, p);
+            Point2D pointQuerySide = this.nearest(nodeQuerySide, p, level + 1); //x.lb
+            double queryDistance = (pointQuerySide == null)?Double.POSITIVE_INFINITY:pointQuerySide.distanceSquaredTo(p);
             double lineDistance = Math.pow(x.p.x() - p.x(), 2);
             double otherDistance = Double.POSITIVE_INFINITY;
             Point2D pointOtherSide = null;
             if (queryDistance > lineDistance) {
-                pointOtherSide = this.nearest(x.rt, p, level + 1);
-                otherDistance = this.distance(pointOtherSide, p);
+                pointOtherSide = this.nearest(nodeOtherSide, p, level + 1); //x.rt
+                otherDistance = (pointOtherSide == null)?Double.POSITIVE_INFINITY:pointOtherSide.distanceSquaredTo(p);
             }
             if (queryDistance <= otherDistance && queryDistance <= thisDistance)
                 return pointQuerySide;
@@ -244,28 +296,24 @@ public class KdTree {
 //                else
 //                    return p;
 //            }
-        }
-        else
-        {
+        } else {
             Node nodeQuerySide = null;
             Node nodeOtherSide = null;
-            if(p.y() < x.p.y()) {
+            if (p.y() < x.p.y()) {
                 nodeQuerySide = x.lb;
                 nodeOtherSide = x.rt;
-            }
-            else
-            {
+            } else {
                 nodeQuerySide = x.rt;
                 nodeOtherSide = x.lb;
             }
-            Point2D pointQuerySide = this.nearest(x.lb, p, level + 1);
-            double queryDistance = this.distance(pointQuerySide, p);
+            Point2D pointQuerySide = this.nearest(nodeQuerySide, p, level + 1); //x.lb
+            double queryDistance = (pointQuerySide == null)?Double.POSITIVE_INFINITY:pointQuerySide.distanceSquaredTo(p);
             double lineDistance = Math.pow(x.p.y() - p.y(), 2);
             double otherDistance = Double.POSITIVE_INFINITY;
             Point2D pointOtherSide = null;
             if (queryDistance > lineDistance) {
-                pointOtherSide = this.nearest(x.rt, p, level + 1);
-                otherDistance = this.distance(pointOtherSide, p);
+                pointOtherSide = this.nearest(nodeOtherSide, p, level + 1); //x.rt
+                otherDistance = (pointOtherSide == null)?Double.POSITIVE_INFINITY:pointOtherSide.distanceSquaredTo(p);
             }
             if (queryDistance <= otherDistance && queryDistance <= thisDistance)
                 return pointQuerySide;
@@ -274,9 +322,10 @@ public class KdTree {
             else
                 return x.p;
         }
+        */
     }
 
-      // Implemented in Point2D, no need implement again
+    // Implemented in Point2D, no need implement again
 //    private double distance(Point2D p1, Point2D p2)
 //    {
 //        if(p1 == null || p2 == null)
@@ -289,7 +338,7 @@ public class KdTree {
     {
         // initialize the data structures from file
 //        String filename = args[0];
-        In in = new In("input10.txt");
+        In in = new In("input5.txt");
 //        PointSET brute = new PointSET();
         KdTree kdtree = new KdTree();
         while (!in.isEmpty()) {
@@ -312,15 +361,16 @@ public class KdTree {
         kdtree.draw();
         StdDraw.show();
 
-/*
+
         // process nearest neighbor queries
         StdDraw.enableDoubleBuffering();
         while (true) {
 
             // the location (x, y) of the mouse
-            double x = StdDraw.mouseX();
-            double y = StdDraw.mouseY();
-            Point2D query = new Point2D(x, y);
+//            double x = StdDraw.mouseX();
+//            double y = StdDraw.mouseY();
+//            Point2D query = new Point2D(x, y);
+            Point2D query = new Point2D(0.71, 0.2);
 
             // draw all of the points
             StdDraw.clear();
@@ -338,14 +388,13 @@ public class KdTree {
 //            StdDraw.setPenRadius(0.02);
 
             // draw in blue the nearest neighbor (using kd-tree algorithm)
-            StdDraw.setPenColor(StdDraw.BLUE);
+            StdDraw.setPenColor(StdDraw.RED);
             kdtree.nearest(query).draw();
             StdDraw.show();
             StdDraw.pause(40);
-        }*/
+        }
 
-
-
+/*
         // process range search queries
         StdDraw.enableDoubleBuffering();
         while (true) {
@@ -399,6 +448,6 @@ public class KdTree {
             StdDraw.show();
             StdDraw.pause(20);
         }
-
+*/
     }
 }
