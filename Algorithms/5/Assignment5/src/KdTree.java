@@ -59,7 +59,6 @@ public class KdTree {
     }
 
     private Node insert(Node x, Point2D p, RectHV rect, int level) {
-        // Remark: Only root could be null in the coming recursion
         if (x == null) {
             this.size++;
             return new Node(p, rect, null, null);
@@ -67,15 +66,31 @@ public class KdTree {
             if (p.equals(x.p))
                 return x;
             if (level % 2 == 0) {
-                if (p.x() < x.p.x())
-                    x.lb = insert(x.lb, p, new RectHV(rect.xmin(), rect.ymin(), x.p.x(), rect.ymax()), level + 1);
-                else
-                    x.rt = insert(x.rt, p, new RectHV(x.p.x(), rect.ymin(), rect.xmax(), rect.ymax()), level + 1);
+                if (p.x() < x.p.x()) {
+                    if(x.lb== null)
+                        x.lb = insert(x.lb, p, new RectHV(rect.xmin(), rect.ymin(), x.p.x(), rect.ymax()), level + 1);
+                    else
+                        x.lb = insert(x.lb, p, x.lb.rect, level + 1);
+                }
+                else {
+                    if(x.rt == null)
+                        x.rt = insert(x.rt, p, new RectHV(x.p.x(), rect.ymin(), rect.xmax(), rect.ymax()), level + 1);
+                    else
+                        x.rt = insert(x.rt, p, x.rt.rect, level + 1);
+                }
             } else {
-                if (p.y() < x.p.y())
-                    x.lb = insert(x.lb, p, new RectHV(rect.xmin(), rect.ymin(), rect.xmax(), x.p.y()), level + 1);
-                else
-                    x.rt = insert(x.rt, p, new RectHV(rect.xmin(), x.p.y(), rect.xmax(), rect.ymax()), level + 1);
+                if (p.y() < x.p.y()) {
+                    if(x.lb== null)
+                        x.lb = insert(x.lb, p, new RectHV(rect.xmin(), rect.ymin(), rect.xmax(), x.p.y()), level + 1);
+                    else
+                        x.lb = insert(x.lb, p, x.lb.rect, level + 1);
+                }
+                else {
+                    if(x.rt == null)
+                        x.rt = insert(x.rt, p, new RectHV(rect.xmin(), x.p.y(), rect.xmax(), rect.ymax()), level + 1);
+                    else
+                        x.rt = insert(x.rt, p, x.rt.rect, level + 1);
+                }
             }
         }
         return x;

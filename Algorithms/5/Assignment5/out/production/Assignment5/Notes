@@ -203,4 +203,75 @@
     Point2D also has function about distance implemented.
     Try a hard way to modify the code. At the beginning I don't want to store the nearest point and its distance since
     this point will be updated dynamically and it seems this is not a regular way. But afterward I implement it I found
-    the answer get closer even it's still scores 82
+    the answer get closer even it's still scores 82.
+
+    A lot of thing are modified here:
+    1) Use a global variable to store the information of nearest point and the distance to query point.
+    2) Need to update the information and distance of input node once the recursive nearest() function is called.
+       Otherwise the comparison use the data out of date.
+    3) There is a big modification on recursive nearest() function since nearest point is introduced.
+       So we have update the process like below:
+       A) Calculate the distance of the point of input node, update the nearest information if input point is nearest.
+       B) Determine the side of query point, recursively get the closed point in this area, update the nearest information.
+       C) If the distance from query point to rectangle of other side is closer than nearest point, that mean the points
+          in this area have chances get closer than the nearest point, so we recursively go through this rectangle.
+       D) Compare the nearest point, the point of input node, the point from query area and the point from other side,
+          return the one closest to query point.
+
+13. Timing KdTree
+    *-----------------------------------------------------------
+    Running 28 total tests.
+
+
+    Test 1a-d: Insert n points into a 2d tree. The table gives the average number of calls
+               to methods in RectHV and Point per call to insert().
+
+                                                                                                    Point2D
+                   n      ops per second       RectHV()           x()               y()             equals()
+    ----------------------------------------------------------------------------------------------------------------
+    => FAILED   160000     250362              22.6  (11.3x)     33.2              31.7              21.6
+    => FAILED   320000     573292              23.0  (11.5x)     33.8              32.3              22.0
+    => FAILED   640000     338686              24.5  (12.3x)     36.1              34.6              23.5
+    => FAILED  1280000     374205              26.6  (13.3x)     39.2              37.7              25.6
+    ==> 0/4 tests passed
+
+    After searching in forum, the problem is about the time we called RectHV(), the number in parenthesis means you call
+    this function x times more than you should call. For example, "22.6  (11.3x)" means you should call 2 times, but you
+    actually call 22.6 times, that's 11.3x times more than you should call.
+
+    In the insert() function, I new a rect and pass it to next recursive call, but if node in the call is not null,
+    I new a rect with input rect again, this is unreasonable. Actually I can use the rect and just modify it and pass
+    it to next recursive call, no need to new another one. Thanks for the grader could check for it! I think it's a
+    very good method to test the function with such a table.
+
+    RectHV doesn't provide any function or property to modify the xmin, ymin, xmax, ymax, and they are final variables  -_-!!!
+    I can just pass the xmin, ymin, xmax, ymax to recursive call to avoid new a RectHV object, but is it proper way to
+    do this?
+
+
+
+    private Node insert(Node x, Point2D p, RectHV rect, int level) {
+        if (x == null) {
+            this.size++;
+            return new Node(p, rect, null, null);
+        } else {
+            if (p.equals(x.p))
+                return x;
+            if (level % 2 == 0) {
+                if (p.x() < x.p.x()) {
+                    x.lb = insert(x.lb, p, new RectHV(rect.xmin(), rect.ymin(), x.p.x(), rect.ymax()), level + 1);
+                }
+                else {
+                    x.rt = insert(x.rt, p, new RectHV(x.p.x(), rect.ymin(), rect.xmax(), rect.ymax()), level + 1);
+                }
+            } else {
+                if (p.y() < x.p.y()) {
+                    x.lb = insert(x.lb, p, new RectHV(rect.xmin(), rect.ymin(), rect.xmax(), x.p.y()), level + 1);
+                }
+                else {
+                    x.rt = insert(x.rt, p, new RectHV(rect.xmin(), x.p.y(), rect.xmax(), rect.ymax()), level + 1);
+                }
+            }
+        }
+        return x;
+    }
